@@ -1,5 +1,6 @@
 # API KEY를 환경변수로 관리하기 위한 설정 파일
 from dotenv import load_dotenv
+import os
 from langchain_openai import ChatOpenAI
 from langchain_community.utilities import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
@@ -11,9 +12,11 @@ from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 load_dotenv()
 
 # MySQL 데이터베이스에 연결합니다.
-db = SQLDatabase.from_uri(
-    "mysql+pymysql://root:Root1234%21@3.94.10.95:3306/testdb"
-)
+db_uri = os.getenv("DATABASE_URL")
+if not db_uri:
+    raise ValueError("DATABASE_URL 환경변수가 설정되어 있지 않습니다.")
+
+db = SQLDatabase.from_uri(db_uri)
 
 # 데이터베이스 dialect 출력
 print(db.dialect)
