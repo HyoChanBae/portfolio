@@ -25,6 +25,27 @@ JOIN customers c ON o.customer_id = c.customer_id
 GROUP BY c.customer_city
 ORDER BY total_revenue DESC
 LIMIT 5;
+
+1. Order count / 주문 수 / 주문건수
+- Count orders from orders table.
+- Exclude canceled and unavailable orders.
+- Required filter:
+  orders.order_status NOT IN ('canceled', 'unavailable')
+
+2. Monthly / 월별
+- Use year-month format.
+- MySQL expression:
+  DATE_FORMAT(orders.order_purchase_timestamp, '%Y-%m')
+- Do not use MONTH(order_purchase_timestamp) alone because it mixes years.
+
+3. Revenue / sales / 매출
+- Use order_items.price.
+- Join orders and order_items.
+- Exclude canceled and unavailable orders.
+
+4. Customer region / city / state
+- customer_city and customer_state are in customers table.
+- Join customers on orders.customer_id = customers.customer_id.
 """
 
 # SQLDatabase.custom_table_info — 테이블별로 LLM에 보강 설명

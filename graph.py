@@ -22,20 +22,20 @@ logging.getLogger("openai").setLevel(logging.WARNING)
 SQL_PROMPT = PromptTemplate.from_template(
     """You are a {dialect} expert. Write ONE executable SQL query only.
 
-Rules:
-- Use ONLY tables/columns listed below. If a column is not in a table, JOIN the correct table.
-- For customer city/state, JOIN customers on orders.customer_id = customers.customer_id.
-- For revenue/sales amounts, use order_items.price (usually with orders + order_items).
-- Do not invent column names (e.g. orders.customer_city does not exist).
-- Unless the user asks for a specific count, limit SELECT results to at most {top_k} rows.
+    Rules:
+    - Use ONLY tables/columns listed below. If a column is not in a table, JOIN the correct table.
+    - For customer city/state, JOIN customers on orders.customer_id = customers.customer_id.
+    - For revenue/sales amounts, use order_items.price (usually with orders + order_items).
+    - Do not invent column names (e.g. orders.customer_city does not exist).
+    - Unless the user asks for a specific count, limit SELECT results to at most {top_k} rows.
 
-Schema relationships and join examples:
-{schema_relationships}
+    Schema relationships and join examples:
+    {schema_relationships}
 
-Table definitions (columns + sample rows):
-{table_info}
+    Table definitions (columns + sample rows):
+    {table_info}
 
-Question: {input}"""
+    Question: {input}"""
 )
 
 MAX_SQL_RETRIES = 2
@@ -84,16 +84,16 @@ def build_graph(
     def classify_question(state: GraphState):
         question = state["question"]
         prompt = f"""
-다음 질문을 분류하세요.
+                    다음 질문을 분류하세요.
 
-분류 기준:
-- db: 데이터베이스 조회, 테이블, 컬럼, 매출, 주문, 고객, 상품, seller, SQL이 필요한 질문
-- general: 일반 지식, 개념 설명, 번역, 코딩 개념, DB 조회가 필요 없는 질문
+                    분류 기준:
+                    - db: 데이터베이스 조회, 테이블, 컬럼, 매출, 주문, 고객, 상품, seller, SQL이 필요한 질문
+                    - general: 일반 지식, 개념 설명, 번역, 코딩 개념, DB 조회가 필요 없는 질문
 
-질문: {question}
+                    질문: {question}
 
-반드시 db 또는 general 중 하나만 답하세요.
-"""
+                    반드시 db 또는 general 중 하나만 답하세요.
+                """
         route = router_llm.invoke(prompt).content.strip().lower()
         if route not in ("db", "general"):
             route = "general"
@@ -104,8 +104,8 @@ def build_graph(
         response = router_llm.invoke(
             f"""다음 질문에 한국어로 자연스럽게 답변하세요.
 
-질문: {question}
-"""
+                질문: {question}
+            """
         )
         return {"answer": response.content}
 
@@ -141,13 +141,13 @@ def build_graph(
         summary = router_llm.invoke(
             f"""사용자 질문에 대해 DB 조회 결과를 바탕으로 한국어로 간결하게 답변하세요.
 
-질문: {question}
-실행 SQL:
-{sql_clean}
+                질문: {question}
+                실행 SQL:
+                {sql_clean}
 
-조회 결과:
-{db_result}
-"""
+                조회 결과:
+                {db_result}
+            """
         )
         return {
             "answer": summary.content,

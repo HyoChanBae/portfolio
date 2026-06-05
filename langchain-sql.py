@@ -73,7 +73,7 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 chain = create_sql_query_chain(llm, db, prompt)
 
 # chain 을 실행하고 결과를 출력합니다.
-generated_sql_query = chain.invoke({"question": "beleza_saude가 뭐야?"})
+generated_sql_query = chain.invoke({"question": "월별 주문 수 알려줘"})
 
 sql_clean = sql_for_copy_paste(generated_sql_query)
 logging.info("생성 SQL (아래 블록 그대로 복사해 DB 클라이언트에 붙여넣기)\n---\n%s\n---", sql_clean)
