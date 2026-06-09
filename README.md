@@ -19,6 +19,8 @@ The infrastructure is strategically decoupled across **multi-instance AWS enviro
   - **Runtime Environment:** Standardized on Python 3.12 within a Ubuntu OS container to ensure cross-instance environment consistency.
 
 ---
+<img width="1337" height="1177" alt="ChatGPT Image 2026년 6월 9일 오전 09_10_13" src="https://github.com/user-attachments/assets/09cb88d0-f01c-4e69-8b65-1bab9f7d04e8" />
+
 
 ## 📊 Dataset Profile
 
