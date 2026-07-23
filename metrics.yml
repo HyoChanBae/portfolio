@@ -1,0 +1,53 @@
+# Text-to-SQL용 비즈니스 메트릭 정의
+# aliases에 걸린 키워드가 질문에 있으면 해당 정의가 우선 주입됩니다.
+
+metrics:
+  - id: repeat_purchase_rate
+    aliases:
+      - 재구매율
+      - 재구매
+      - repeat purchase rate
+      - repurchase rate
+      - repeat_purchase_rate
+    definition:
+      numerator: count(customer_id where order_count >= 2)
+      denominator: count(distinct customer_id)
+    sql_guidance: |
+      고객별 order_count = orders에서 customer_id별 COUNT(order_id).
+      canceled, unavailable 주문은 제외:
+        orders.order_status NOT IN ('canceled', 'unavailable')
+      재구매 고객: order_count >= 2 인 customer_id.
+      재구매율 = 재구매 고객 수 / 전체 distinct customer_id.
+      "재구매율이 높은 고객"처럼 고객 목록을 물을 때는
+      고객별 주문 수를 구한 뒤 order_count >= 2 인 고객을
+      order_count DESC로 정렬해 반환.
+
+  - id: revenue
+    aliases:
+      - 매출
+      - 매출액
+      - revenue
+      - sales
+      - 판매액
+    definition:
+      numerator: SUM(order_items.price)
+      denominator: null
+    sql_guidance: |
+      매출은 order_items.price 합산.
+      orders와 order_items를 order_id로 JOIN.
+      canceled, unavailable 주문 제외.
+      고객 도시/주 기준이면 customers JOIN 필수.
+
+  - id: average_order_value
+    aliases:
+      - 객단가
+      - 평균 주문 금액
+      - AOV
+      - average order value
+    definition:
+      numerator: SUM(order_items.price)
+      denominator: COUNT(DISTINCT orders.order_id)
+    sql_guidance: |
+      AOV = SUM(order_items.price) / COUNT(DISTINCT orders.order_id)
+      orders + order_items JOIN.
+      canceled, unavailable 주문 제외.

@@ -10,6 +10,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 
 from db_config import get_db
+from metrics_context import format_business_metrics
 from schema_context import SCHEMA_RELATIONSHIPS
 from sql_utils import sql_for_copy_paste
 
@@ -28,9 +29,13 @@ SQL_PROMPT = PromptTemplate.from_template(
     - For revenue/sales amounts, use order_items.price (usually with orders + order_items).
     - Do not invent column names (e.g. orders.customer_city does not exist).
     - Unless the user asks for a specific count, limit SELECT results to at most {top_k} rows.
+    - When a business metric applies, follow Business metric definitions exactly.
 
     Schema relationships and join examples:
     {schema_relationships}
+
+    Business metric definitions:
+    {business_metrics}
 
     Table definitions (columns + sample rows):
     {table_info}
@@ -74,11 +79,10 @@ def build_graph(
     router_llm = router_llm or ChatOpenAI(model="gpt-4o-mini", temperature=0)
     sql_llm = sql_llm or ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
-    sql_prompt = SQL_PROMPT.partial(
+    sql_prompt_base = SQL_PROMPT.partial(
         dialect=db.dialect,
         schema_relationships=SCHEMA_RELATIONSHIPS,
     )
-    sql_chain = create_sql_query_chain(sql_llm, db, sql_prompt)
     execute_query = QuerySQLDataBaseTool(db=db)
 
     def classify_question(state: GraphState):
@@ -111,6 +115,13 @@ def build_graph(
 
     def answer_db(state: GraphState):
         question = state["question"]
+        sql_chain = create_sql_query_chain(
+            sql_llm,
+            db,
+            sql_prompt_base.partial(
+                business_metrics=format_business_metrics(question)
+            ),
+        )
         chain_input: dict[str, str] = {"question": question}
         sql_clean = ""
         db_result = ""
