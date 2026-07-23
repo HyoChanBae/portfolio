@@ -1,3 +1,6 @@
+[tool.poetry]
+package-mode = false
+
 [project]
 name = "langchain-test"
 version = "0.1.0"
@@ -14,7 +17,7 @@ dependencies = [
     "sqlalchemy (>=2.0.49,<3.0.0)",
     "pymysql (>=1.1.2,<2.0.0)",
     "langchain-classic (>=1.0.3,<2.0.0)",
-    "langgraph (>=0.2.0,<1.0.0)",
+    "langgraph (>=1.1.10,<2.0.0)",
     "python-dotenv (>=1.0.0,<2.0.0)"
 ]
 
